@@ -19,8 +19,38 @@
 require('header.php');
 
 if(($ct = DBContestInfo($_SESSION["usertable"]["contestnumber"])) == null)
-	ForceLoad("../index.php");
+    ForceLoad("../index.php");
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Define styles for unvisited links */
+a:link {
+    color: blue;
+    text-decoration: none;
+}
+
+/* Define styles for visited links */
+a:visited {
+    color: purple; /* Change to your desired color */
+    text-decoration: none;
+}
+
+/* Define styles for mouse-over links */
+a:hover {
+    color: red;
+    text-decoration: underline;
+}
+
+/* Define styles for active links */
+a:active {
+    color: orange;
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
 <br><b>Information:</b>
 <?php
 /*
@@ -61,17 +91,17 @@ if(is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
 $prob = DBGetProblems($_SESSION["usertable"]["contestnumber"]);
 for ($i=0; $i<count($prob); $i++) {
   echo " <tr>\n";
-//  echo "  <td nowrap>" . $prob[$i]["number"] . "</td>\n";
   echo "  <td nowrap>" . $prob[$i]["problem"];
   if($prob[$i]["color"] != "")
           echo " <img alt=\"".$prob[$i]["colorname"]."\" width=\"20\" ".
-			  "src=\"" . balloonurl($prob[$i]["color"]) ."\" />\n";
+              "src=\"" . balloonurl($prob[$i]["color"]) ."\" />\n";
   echo "</td>\n";
   echo "  <td nowrap>" . $prob[$i]["basefilename"] . "&nbsp;</td>\n";
   echo "  <td nowrap>" . $prob[$i]["fullname"] . "&nbsp;</td>\n";
   if (isset($prob[$i]["descoid"]) && $prob[$i]["descoid"] != null && isset($prob[$i]["descfilename"])) {
     echo "  <td nowrap><a href=\"../filedownload.php?" . filedownload($prob[$i]["descoid"], $prob[$i]["descfilename"]) .
-		"\">" . basename($prob[$i]["descfilename"]) . "</a></td>\n";
+        "\" style=\"color: blue; text-decoration: none;\">"
+        . basename($prob[$i]["descfilename"]) . "</a></td>\n";
   }
   else
     echo "  <td nowrap>no description file available</td>\n";
