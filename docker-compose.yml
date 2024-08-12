@@ -36,6 +36,8 @@ services:
         volumes:
             - ./src/team/header.php:/var/www/boca/src/team/header.php
             - ./src/Css.php:/var/www/boca/src/Css.php
+            - ./src/system/header.php:/var/www/boca/src/system/header.php
+            - ./src/admin/header.php:/var/www/boca/src/admin/header.php
 
     # # online judge
     # boca-jail:
