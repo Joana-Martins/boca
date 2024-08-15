@@ -35,6 +35,7 @@ services:
             - 8000:80
         volumes:
             - ./src/team/run.php:/var/www/boca/src/team/run.php
+            - ./src/team/problem.php:/var/www/boca/src/team/problem.php
             - ./src/Css.php:/var/www/boca/src/Css.php
 
     # # online judge
