@@ -100,8 +100,9 @@ for ($i=0; $i<count($prob); $i++) {
   echo "  <td nowrap>" . $prob[$i]["fullname"] . "&nbsp;</td>\n";
   if (isset($prob[$i]["descoid"]) && $prob[$i]["descoid"] != null && isset($prob[$i]["descfilename"])) {
     echo "  <td nowrap><a href=\"../filedownload.php?" . filedownload($prob[$i]["descoid"], $prob[$i]["descfilename"]) .
-        "\" style=\"color: blue; text-decoration: none;\">"
-        . basename($prob[$i]["descfilename"]) . "</a></td>\n";
+    "\" class=\"descfile-link\" style=\"color: blue; text-decoration: none;\">"
+    . basename($prob[$i]["descfilename"]) . "</a></td>\n";
+
   }
   else
     echo "  <td nowrap>no description file available</td>\n";
@@ -111,5 +112,17 @@ echo "</table>";
 if (count($prob) == 0) echo "<br><center><b><font color=\"#ff0000\">NO PROBLEMS AVAILABLE YET</font></b></center>";
 
 ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    //Click event to desc files
+    const descfileLinks = document.querySelectorAll('.descfile-link');
+    descfileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            alert('File downloaded!');
+            link.style.color = 'red'; // Change link color
+        });
+    });
+});
+</script>
 </body>
 </html>
