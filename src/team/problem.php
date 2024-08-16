@@ -48,6 +48,37 @@ if(is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
 }
 ?>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  updateSummary();  // Atualiza o resumo ao carregar a página
+});
+
+function updateSummary() {
+  const rows = document.querySelectorAll('#run-table tbody tr');
+  const total = rows.length;
+  let completed = 0;
+
+  rows.forEach(row => {
+    const answer = row.children[4].innerText.toLowerCase();
+    if (answer.includes('yes')) {
+      completed++;
+    }
+  });
+
+  const remaining = total - completed;
+
+  document.getElementById('total-problems').innerText = total;
+  document.getElementById('completed-exercises').innerText = completed;
+  document.getElementById('remaining-exercises').innerText = remaining;
+}
+</script>
+
+<!-- Summary Section -->
+<div>
+  <p>Total Problems: <span id="total-problems"></span></p>
+  <p>Completed Exercises: <span id="completed-exercises"></span></p>
+  <p>Remaining Exercises: <span id="remaining-exercises"></span></p>
+</div>
 
 <br><br><br>
 <table width="100%" border=1>
