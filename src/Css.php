@@ -86,3 +86,9 @@ p.link a:hover span {
   text-align:left;
   display: block;
 }
+
+/* Estilo para destacar a linha do usuário logado */
+.highlighted-row {
+    background-color: #Ffff64; /* light yellow */
+    font-weight: bold;
+}
