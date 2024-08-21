@@ -25,16 +25,25 @@ services:
 
     # web app
     boca-web:
+        image: ghcr.io/joaofazolo/boca-docker/boca-web:latest
+        depends_on:
+            - boca-db
         environment:
             # database configuration
             # privileged user password
             - BOCA_DB_SUPER_PASSWORD=superpass
+            # - BOCA_FORGOT_PASSWORD_LINK=https://senha.inf.ufes.br/
+        volumes:
+            - ./src/index.php:/var/www/boca/src/index.php
         ports: 
             - 8000:80
 
     # online judge
     boca-jail:
+        image: ghcr.io/joaofazolo/boca-docker/boca-jail:latest
         privileged: true
+        depends_on:
+            - boca-db
         
     # database
     boca-db:
