@@ -25,7 +25,7 @@ header ("Pragma: no-cache");
 header ("Content-Type: text/html; charset=utf-8");
 session_start();
 if(!isset($_POST['noflush']))
-	ob_end_flush();
+    ob_end_flush();
 //$loc = $_SESSION['loc'];
 //$locr = $_SESSION['locr'];
 $loc = $locr = "..";
@@ -36,24 +36,24 @@ require_once("$locr/globals.php");
 require_once("$locr/db.php");
 
 if(!isset($_POST['noflush'])) {
-	require_once("$locr/version.php");
-	echo "<html><head><title>Admin's Page</title>\n";
-	echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
-	echo "<link rel=stylesheet href=\"$loc/Css.php\" type=\"text/css\">\n";
+    require_once("$locr/version.php");
+    echo "<html><head><title>Admin's Page</title>\n";
+    echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n";
+    echo "<link rel=stylesheet href=\"$loc/Css.php\" type=\"text/css\">\n";
 }
 
 if(!ValidSession()) {
-	InvalidSession("admin/index.php");
-        ForceLoad("$loc/index.php");
+    InvalidSession("admin/index.php");
+    ForceLoad("$loc/index.php");
 }
 if($_SESSION["usertable"]["usertype"] != "admin") {
-	IntrusionNotify("admin/index.php");
-	ForceLoad("$loc/index.php");
+    IntrusionNotify("admin/index.php");
+    ForceLoad("$loc/index.php");
 }
 
 if ((isset($_GET["Submit1"]) && $_GET["Submit1"] == "Transfer") ||
     (isset($_GET["Submit3"]) && $_GET["Submit3"] == "Transfer scores")) {
-  echo "<meta http-equiv=\"refresh\" content=\"60\" />";
+    echo "<meta http-equiv=\"refresh\" content=\"60\" />";
 }
 
 if(!isset($_POST['noflush'])) {
@@ -91,6 +91,19 @@ if(!isset($_POST['noflush'])) {
 	echo "</table>\n";
 }
 
-//if(decryptData(encryptData("aaaaa","senha"),"senha")) MSGError("yay");
+    $highlightClass = 'current-page';
 
+    echo "<table border=0 width=\"100%\" align=center>\n";
+    echo " <tr>\n";
+
+    foreach ($menuItems as $item) {
+        $menuItemClass = '';
+        if (basename($item['url']) == $currentPage) {
+            $menuItemClass = $highlightClass;
+        }
+        echo "  <td align=center><a class=\"menu $menuItemClass\" style=\"font-weight:bold; padding: 2px 3px; border-radius: 5px;\" href={$item['url']}>{$item['name']}</a></td>\n";
+    }
+    echo " </tr>\n";
+    echo "</table>\n";
+}
 ?>

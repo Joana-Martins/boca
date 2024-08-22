@@ -36,11 +36,11 @@ echo "<link rel=stylesheet href=\"../Css.php\" type=\"text/css\">\n";
 //echo "<meta http-equiv=\"refresh\" content=\"60\" />";
 if(!ValidSession()) {
 	InvalidSession("system/index.php");
-        ForceLoad("../index.php");
+    ForceLoad("../index.php");
 }
 if($_SESSION["usertable"]["usertype"] != "system") {
 	IntrusionNotify("system/index.php");
-        ForceLoad("../index.php");
+    ForceLoad("../index.php");
 }
 
 echo "</head><body><table border=1 width=\"100%\">\n";
@@ -52,6 +52,21 @@ echo "Username: " . $_SESSION["usertable"]["userfullname"] ."<br>\n";
 list($clockstr,$clocktype)=siteclock();
 echo "</td><td bgcolor=\"#eeee00\" align=center nowrap>&nbsp;".$clockstr."&nbsp;</td></tr>\n";
 echo "</table>\n";
+
+// Define os itens do menu
+$menuItems = [
+    ['url' => 'contest.php', 'name' => 'Contest'],
+    // ['url' => 'importxml.php', 'name' => 'Import'], // Item comentado
+    ['url' => 'option.php', 'name' => 'Options'],
+    ['url' => '../index.php', 'name' => 'Logout'],
+];
+
+$currentURL = $_SERVER['REQUEST_URI'];
+$currentPage = basename($currentURL);
+
+$highlightClass = 'current-page';
+$selectedPage = ''; 
+
 echo "<table border=0 width=\"100%\" align=center>\n";
 echo " <tr>\n";
 $currentPage = basename($_SERVER['REQUEST_URI']);

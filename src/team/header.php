@@ -128,6 +128,23 @@ if(!isset($_SESSION["popuptime"]) || $_SESSION["popuptime"] < time()-120) {
 	}
 }
 
+$menuItems = [
+    ['url' => 'problem.php', 'name' => 'Problems'],
+    ['url' => 'run.php', 'name' => 'Runs'],
+    ['url' => 'score.php', 'name' => 'Score'],
+    ['url' => 'clar.php', 'name' => 'Clarifications'],
+    ['url' => 'task.php', 'name' => 'Tasks'],
+    ['url' => 'files.php', 'name' => 'Backups'],
+    ['url' => 'option.php', 'name' => 'Options'],
+    ['url' => '../index.php', 'name' => 'Logout'],
+];
+
+$currentURL = $_SERVER['REQUEST_URI'];
+$currentPage = basename($currentURL);
+
+$highlightClass = 'current-page';
+$selectedPage = ''; 
+
 list($clockstr,$clocktype)=siteclock();
 echo "</td><td bgcolor=\"#aaaaee\" align=center nowrap>&nbsp;".$clockstr."&nbsp;</td></tr>\n";
 echo "</table>\n";
