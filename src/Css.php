@@ -20,6 +20,7 @@ $corfundo = "#e0e0d0";
 $corfrente = "#000000";
 $corfundo2 = "#dfdfdf";
 $cormenu = "#dfdfdf";
+$corhighlight = "#ffff00";
 ?>
 div#popupnew {
 position:absolute;
@@ -87,8 +88,4 @@ p.link a:hover span {
   display: block;
 }
 
-/* Estilo para destacar a linha do usuário logado */
-.highlighted-row {
-    background-color: #Ffff64; /* light yellow */
-    font-weight: bold;
-}
+.highlighted-row {background-color: <?php echo $corhighlight?>;}
