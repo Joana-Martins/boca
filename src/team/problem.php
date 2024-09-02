@@ -1,25 +1,25 @@
 <?php
-////////////////////////////////////////////////////////////////////////////////
-//BOCA Online Contest Administrator
-//    Copyright (C) 2003-2012 by BOCA Development Team (bocasystem@gmail.com)
-//
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version.
-//
-//    This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-////////////////////////////////////////////////////////////////////////////////
-// Last modified 05/aug/2012 by cassio@ime.usp.br
+session_start(); // Inicia a sessão
+
 require('header.php');
 
-if(($ct = DBContestInfo($_SESSION["usertable"]["contestnumber"])) == null)
+// Inicializa o array de links clicados na sessão, se não estiver definido
+if (!isset($_SESSION['clicked_links'])) {
+    $_SESSION['clicked_links'] = [];
+}
+
+// Atualiza os links clicados se recebido via GET
+if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['clicked_id'])) {
+    $clicked_id = $_GET['clicked_id'];
+    // Adiciona o link clicado à sessão se ainda não estiver presente
+    if (!in_array($clicked_id, $_SESSION['clicked_links'])) {
+        $_SESSION['clicked_links'][] = $clicked_id;
+    }
+}
+
+if (($ct = DBContestInfo($_SESSION["usertable"]["contestnumber"])) == null) {
     ForceLoad("../index.php");
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -33,7 +33,7 @@ a:link {
 
 /* Define styles for visited links */
 a:visited {
-    color: purple; /* Change to your desired color */
+    color: purple;
     text-decoration: none;
 }
 
@@ -48,19 +48,18 @@ a:active {
     color: orange;
     text-decoration: underline;
 }
+
+/* Define styles for links that should appear red due to being clicked */
+.red-link {
+    color: red !important;
+}
 </style>
 </head>
 <body>
 <br><b>Information:</b>
 <?php
-/*
-<br>General information: <a href="https://global.naquadah.com.br/boca/info_sheet.pdf">info_sheet.pdf</a>
 
-<br>Timelimits:
-<a href="https://global.naquadah.com.br/boca/contest_times.pdf">contest_times.pdf</a> 
- */
-
-if(is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
+if (is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
 ?>
 <b>PLAIN FILES:</b>  <b>CONTEST</b> (
 <a href='https://global.naquadah.com.br/boca/secretcontest/maratona.pdf'>PT</a> |
@@ -78,7 +77,6 @@ if(is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
 }
 ?>
 
-
 <br><br><br>
 <table width="100%" border=1>
  <tr>
@@ -89,37 +87,52 @@ if(is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
  </tr>
 <?php
 $prob = DBGetProblems($_SESSION["usertable"]["contestnumber"]);
-for ($i=0; $i<count($prob); $i++) {
-  echo " <tr>\n";
-  echo "  <td nowrap>" . $prob[$i]["problem"];
-  if($prob[$i]["color"] != "")
-          echo " <img alt=\"".$prob[$i]["colorname"]."\" width=\"20\" ".
-              "src=\"" . balloonurl($prob[$i]["color"]) ."\" />\n";
-  echo "</td>\n";
-  echo "  <td nowrap>" . $prob[$i]["basefilename"] . "&nbsp;</td>\n";
-  echo "  <td nowrap>" . $prob[$i]["fullname"] . "&nbsp;</td>\n";
-  if (isset($prob[$i]["descoid"]) && $prob[$i]["descoid"] != null && isset($prob[$i]["descfilename"])) {
-    echo "  <td nowrap><a href=\"../filedownload.php?" . filedownload($prob[$i]["descoid"], $prob[$i]["descfilename"]) .
-    "\" class=\"descfile-link\" style=\"color: blue; text-decoration: none;\">"
-    . basename($prob[$i]["descfilename"]) . "</a></td>\n";
+for ($i = 0; $i < count($prob); $i++) {
+    echo " <tr>\n";
+    echo "  <td nowrap>" . $prob[$i]["problem"];
+    if ($prob[$i]["color"] != "")
+        echo " <img alt=\"" . $prob[$i]["colorname"] . "\" width=\"20\" src=\"" . balloonurl($prob[$i]["color"]) . "\" />\n";
+    echo "</td>\n";
+    echo "  <td nowrap>" . $prob[$i]["basefilename"] . "&nbsp;</td>\n";
+    echo "  <td nowrap>" . $prob[$i]["fullname"] . "&nbsp;</td>\n";
 
-  }
-  else
-    echo "  <td nowrap>no description file available</td>\n";
-  echo " </tr>\n";
+    $descfile_id = $prob[$i]["descoid"];
+    $descfile_name = $prob[$i]["descfilename"];
+    
+    // Verifica se o link foi clicado e deve ser vermelho
+    $link_class = in_array($descfile_id, $_SESSION['clicked_links']) ? 'red-link' : '';
+    
+    if (isset($descfile_id) && $descfile_id != null && isset($descfile_name)) {
+        echo "  <td nowrap><a href=\"../filedownload.php?" . filedownload($descfile_id, $descfile_name) .
+        "\" class=\"descfile-link $link_class\" data-id=\"$descfile_id\">" . basename($descfile_name) . "</a></td>\n";
+    } else {
+        echo "  <td nowrap>no description file available</td>\n";
+    }
+    echo " </tr>\n";
 }
 echo "</table>";
 if (count($prob) == 0) echo "<br><center><b><font color=\"#ff0000\">NO PROBLEMS AVAILABLE YET</font></b></center>";
 
 ?>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    //Click event to desc files
+    // Seleciona os links de descrição de arquivos
     const descfileLinks = document.querySelectorAll('.descfile-link');
     descfileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            alert('File downloaded!');
-            link.style.color = 'red'; // Change link color
+        link.addEventListener('click', (event) => {
+            const linkId = link.getAttribute('data-id');
+            // Envia uma requisição GET para atualizar a sessão com o ID do link clicado
+            const linkUrl = new URL(window.location.href);
+            linkUrl.searchParams.set('clicked_id', linkId);
+            fetch(linkUrl) // Faz a requisição para atualizar a sessão
+                .then(response => {
+                    if (response.ok) {
+                        link.classList.add('red-link'); // Adiciona a classe vermelha para indicar o link clicado
+                        window.location.href = link.href; // Continua com o download após atualizar a sessão
+                    }
+                });
+            event.preventDefault(); // Previne o comportamento padrão para realizar a atualização corretamente
         });
     });
 });
