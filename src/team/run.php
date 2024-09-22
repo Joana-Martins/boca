@@ -16,8 +16,42 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////////////
 require('header.php');
+
 $ds = DIRECTORY_SEPARATOR;
 if($ds=="") $ds = "/";
+
+// Função para contar os problemas resolvidos com "Yes"
+function countSuccessfulRuns($contestnumber) {
+  $runs = DBUserRuns($contestnumber, $_SESSION["usertable"]["usersitenumber"], $_SESSION["usertable"]["usernumber"]);
+  $completedProblems = [];
+
+  // Percorre as submissões e conta as que têm resposta "Yes"
+  foreach ($runs as $run) {
+      if (strtolower($run['answer']) === 'yes') {
+          $completedProblems[$run['problem']] = true;
+      }
+  }
+
+  return count($completedProblems);
+}
+
+// Obtenha o número total de problemas
+$problems = DBGetProblems($_SESSION["usertable"]["contestnumber"]);
+$totalProblemsCount = count($problems);
+
+// Obtenha o número de submissões bem-sucedidas
+$successfulRunsCount = countSuccessfulRuns($_SESSION["usertable"]["contestnumber"]);
+
+?>
+
+<!-- Sumário -->
+<div>
+  <p>Total Problems: <span id="total-problems"></span></p>
+  <p>Completed Problems: <span id="completed-problems"></span></p>
+  <p>Remaining Problems: <span id="remaining-problems"></span></p>
+</div>
+
+<?php
 
 if (isset($_POST["problem"]) && isset($_POST["language"]) &&
     ((isset($_FILES["sourcefile"]) && isset($_POST["Submit"]) && $_FILES["sourcefile"]["name"]!="") || (isset($_POST["data"]) && isset($_POST["name"])))) {
@@ -318,7 +352,8 @@ if($redo) {
   $_SESSION['forceredo']=false;
   if(($st = DBSiteInfo($_SESSION["usertable"]["contestnumber"],$_SESSION["usertable"]["usersitenumber"])) == null)
     ForceLoad("../index.php");
-  $strtmp="<br>\n<table width=\"100%\" border=1>\n <tr>\n  <td><b>Run #</b></td>\n<td><b>Time</b></td>\n".
+
+  $strtmp="<br>\n<table class=\"bocaTable\" width=\"100%\" border=1 style=\"width: 100%\">\n <tr>\n  <td><b>Run #</b></td>\n<td><b>Time</b></td>\n".
     "  <td><b>Problem</b></td>\n  <td><b>Language</b></td>\n  <td><b>Answer</b></td>\n  <td><b>File</b></td>\n </tr>\n";
   $strcolors = "0";
   $run = DBUserRuns($_SESSION["usertable"]["contestnumber"],
@@ -357,6 +392,103 @@ if($redo) {
   }
   $strtmp .= "</table>";
   if (count($run) == 0) $strtmp .= "<br><center><b><font color=\"#ff0000\">NO RUNS AVAILABLE</font></b></center>";
+
+  $strtmp .= "<div id=\"externalToolbar\" " . ((count($run) == 0) ? "style=\"display: none\"" : "") . "></div>";
+  $strtmp .= "
+  <script language=\"JavaScript\">
+  // Custom string caster
+  function customStringCaster(val) {
+    return val.toString();
+  }
+
+  // Custom string sorter
+  function customStringSorter(n1, n2) {
+    if (n1.value.toLowerCase() < n2.value.toLowerCase()) {
+      return -1;
+    }
+    if (n2.value.toLowerCase() < n1.value.toLowerCase()) {
+      return 1;
+    }
+    return 0;
+  }
+
+  var tfConfig = {
+    base_path: '../vendor/tablefilter/0.7.3/',
+    col_widths: [
+      '10%', '10%', '15%',
+      '15%', '35%', '15%'
+    ],
+    col_types: [
+      'number', 'date', 'customstring',
+      'customstring', 'customstring', 'customstring'
+    ],
+    col_2: 'select',
+    col_3: 'select',
+    col_4: 'select',
+    responsive: {
+      details: true
+    },
+    toolbar: {
+      target_id: 'externalToolbar'
+    },
+    sticky_headers: true,
+    rows_counter: {
+      ignore_case: true
+    },
+    watermark: 'Filter...',
+    auto_filter: {
+      delay: 100 //milliseconds
+    },
+    msg_filter: 'Filtering...',
+    loader: true,
+    status_bar: true,
+    ignore_diacritics: true," .
+    (count($run) != 0 ? 
+    "no_results_message: {
+      content: '<center><b><font color=\"#ff0000\">NO RUNS FOUND</font></b></center>',
+    }," : "") . "
+    paging: {
+      results_per_page: ['Records: ', [50, 200, 1000, 1000000]],
+    },
+    // grid layout customisation
+    grid_layout: {
+      width: '100%'," .
+      (count($run) != 0 ?
+      "height: '400px'" :
+      "height: 'auto'") . "
+    },
+    btn_reset: true,
+    extensions: [
+      {
+        name: 'filtersVisibility',
+        visible_at_start: false
+      },
+      {
+        name: 'colsVisibility',
+        enable_tick_all: true
+      },
+      {
+        name: 'sort',
+        // Register custom sorter when sort extension is loaded
+        on_sort_loaded: function(o, sort) {
+          // addSortType accepts:
+          // 1. an identifier of the sort type (lowercase)
+          // 2. an optional function that takes a string and casts it to a
+          // desired format, if not specified it returns the string
+          // 3. an optional compare function taking 2 values and compares
+          // them. If not specified defaults to `less than compare` type
+          sort.addSortType('customstring', customStringCaster, customStringSorter);
+        }
+      },
+    ]
+  };
+  var tf = new TableFilter(
+    document.querySelector('.bocaTable'),
+    tfConfig
+  );
+  tf.init();
+</script>";
+
   $linesubmission = @file_get_contents($_SESSION["locr"] . $ds . "private" . $ds . 'run-using-command.config');
   if(trim($linesubmission) == '1') {
     $strtmp .= "<br><br><center><b>To submit a program, use the command-line tool:</b>\n<br>".
@@ -442,7 +574,24 @@ if($redo) {
 }
 echo $strtmp;
 ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  updateSummary();  // Chama a função após carregar o DOM completamente
+});
 
+function updateSummary() {
+  // Pega os valores do PHP e passa para o JavaScript
+  let total = <?php echo $totalProblemsCount; ?>; // Total de problemas
+  let completed = <?php echo $successfulRunsCount; ?>; // Problemas resolvidos com submissões "Yes"
 
+  // Calcula o restante dos problemas
+  let remaining = total - completed;
+
+  // Atualiza os elementos do sumário na página
+  document.getElementById('total-problems').innerText = total;
+  document.getElementById('completed-problems').innerText = completed;
+  document.getElementById('remaining-problems').innerText = remaining;
+}
+</script>
 </body>
 </html>
