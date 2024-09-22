@@ -69,7 +69,20 @@ echo '<script>
   }
 </script>';
 
-
+$strtmp = "<br><br>
+<div>
+    <button id=\"sort-direction\">⬆</button>
+    <label for=\"sort-select\">Sort by: </label>
+    <select id=\"sort-select\">
+        <option value=\"0\">Run #</option>
+        <option value=\"1\">Time</option>
+        <option value=\"2\">Problem</option>
+        <option value=\"3\">Language</option>
+        <option value=\"4\">Answer</option>
+        <option value=\"5\">File</option>
+    </select>
+</div>";
+echo $strtmp;
 
 $ds = DIRECTORY_SEPARATOR;
 if($ds=="") $ds = "/";
@@ -541,16 +554,29 @@ function sortTable() {
 }
 
 function filterTable(input, column) {
-  const filter = input.value.toLowerCase();
+  const filters = document.querySelectorAll('.filter-input'); // Seleciona todos os filtros de coluna
   const table = document.getElementById('run-table');
   const rows = table.getElementsByTagName('tr');
 
   for (let i = 1; i < rows.length; i++) {
-    const cells = rows[i].getElementsByTagName('td');
-    if (cells[column]) {
-      const txtValue = cells[column].textContent || cells[column].innerText;
-      rows[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? '' : 'none';
+    let shouldDisplay = true;
+
+    for (let j = 0; j < filters.length; j++) {
+      const filterValue = filters[j].value.toLowerCase();
+      const cell = rows[i].getElementsByTagName('td')[j];
+
+      if (cell) {
+        const txtValue = cell.textContent || cell.innerText;
+        // Se houver um valor no filtro e a célula não corresponder, marca a linha como não exibível
+        if (filterValue !== '' && txtValue.toLowerCase().indexOf(filterValue) === -1) {
+          shouldDisplay = false;
+          break; // Sai do loop interno, já que a linha não deve ser exibida
+        }
+      }
     }
+
+    // Exibe ou oculta a linha com base na correspondência com todos os filtros
+    rows[i].style.display = shouldDisplay ? '' : 'none';
   }
 }
 </script>

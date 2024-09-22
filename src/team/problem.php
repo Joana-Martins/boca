@@ -48,12 +48,20 @@ if(is_readable('/var/www/boca/src/sample/secretcontest/maratona.pdf')) {
 }
 ?>
 
-<br><br><br>
+<br><br>
 
-<!-- Adiciona o botão de direção de ordenação -->
 <div>
-    <button id="sort-direction">⬆</button> Sort by Name
+    <button id="sort-direction">⬆</button>
+    <label for="filter-column">Sort by: </label>
+    <select id="filter-column">
+        <option value="0">Name</option>
+        <option value="1">Basename</option>
+        <option value="2">Fullname</option>
+        <option value="3">Descfile</option>
+    </select>
 </div>
+
+<br>
 
 <table width="100%" border=1 id="problem-table">
  <thead>
@@ -108,7 +116,7 @@ function sortTable() {
     const table = document.getElementById('problem-table');
     const tbody = table.tBodies[0];
     const rows = Array.from(tbody.querySelectorAll('tr'));
-    const index = 0; // Order by name
+    const index = document.getElementById('filter-column').value; // Order by name
     
     rows.sort((a, b) => {
         const cellA = a.children[index].innerText.toLowerCase();
