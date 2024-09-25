@@ -45,13 +45,16 @@ if($_SESSION["usertable"]["usertype"] != "team") {
         ForceLoad("../index.php");
 }
 
-echo "<script language=\"javascript\" src=\"../reload.js\"></script>\n";
-echo "</head><body onload=\"Comecar()\" onunload=\"Parar()\"><table border=1 width=\"100%\">\n";
-echo "<tr><td nowrap bgcolor=\"#aaaaee\" align=center>";
-echo "<img src=\"../images/smallballoontransp.png\" alt=\"\">";
-echo "<font color=\"#000000\">BOCA</font>";
-echo "</td><td bgcolor=\"#aaaaee\" width=\"99%\">\n";
-echo "Username: " . $_SESSION["usertable"]["userfullname"] . " (site=".$_SESSION["usertable"]["usersitenumber"].")\n";
+// Container principal para o cabeçalho e informações do usuário
+echo "<div style='display: flex; align-items: center; justify-content: space-between; background-color: #B7D8BC; padding: 1px; border: 2px solid #0E1E0F;'>\n"; // Adiciona a borda de divisão
+echo "<div style='display: flex; align-items: center;'>\n"; // Adiciona um container flex para alinhar BOCA e o Username à esquerda
+echo "<div style='margin-right: 10px;'><img src=\"../images/smallballoontransp.png\" alt=\"\"></div>\n"; // Ajusta a margem para aproximar a imagem de BOCA
+echo "<div style='font-weight: bold; margin-right: 20px; border-right:2px solid #0E1E0F;padding-right: 20px'>\n"; // Margem direita para separar BOCA do Username
+echo "<font color=\"#000000\">BOCA</font>\n";
+echo "</div>\n";
+echo "<div style='flex-grow: 2; text-align: center;'>\n";
+echo "Username: " . $_SESSION["usertable"]["userfullname"] . " (site=" . $_SESSION["usertable"]["usersitenumber"] . ")\n";
+echo "</div>\n";
 
 $ds = DIRECTORY_SEPARATOR;
 if($ds=="") $ds = "/";
@@ -127,20 +130,23 @@ if(!isset($_SESSION["popuptime"]) || $_SESSION["popuptime"] < time()-120) {
 		}
 	}
 }
+echo "</div>\n";
 
-list($clockstr,$clocktype)=siteclock();
-echo "</td><td bgcolor=\"#aaaaee\" align=center nowrap>&nbsp;".$clockstr."&nbsp;</td></tr>\n";
-echo "</table>\n";
-echo "<table border=0 width=\"100%\" align=center>\n";
-echo " <tr>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=problem.php>Problems</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=run.php>Runs</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=score.php>Score</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=clar.php>Clarifications</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=task.php>Tasks</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=files.php>Backups</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=option.php>Options</a></td>\n";
-echo "  <td align=center width=\"12%\"><a class=menu style=\"font-weight:bold\" href=../index.php>Logout</a></td>\n";
-echo " </tr>\n"; 
-echo "</table>\n";
+// Relógio do site
+list($clockstr, $clocktype) = siteclock();
+echo "<div style='flex-shrink: 0; text-align: center; background-color: #B7D8BC; padding: 5px;'>" . $clockstr . "</div>\n";
+echo "</div>\n";
+// Barra de navegação
+echo "<div style='display: flex; justify-content: space-around; margin-top: 10px;'>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='problem.php'>Problems</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='run.php'>Runs</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='score.php'>Score</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='clar.php'>Clarifications</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='task.php'>Tasks</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='files.php'>Backups</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='option.php'>Options</a>\n";
+echo "  <a class='menu' style='font-weight: bold; text-align: center;' href='../index.php'>Logout</a>\n";
+echo "</div>\n";
+
+echo "</body></html>";
 ?>
